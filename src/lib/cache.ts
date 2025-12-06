@@ -7,6 +7,8 @@ interface CacheEntry<T> {
     expiresAt: number;
 }
 
+import { CACHE_TTL_SECONDS } from '@/lib/config';
+
 class MemoryCache {
     private cache: Map<string, CacheEntry<unknown>> = new Map();
     private defaultTtlMs: number;
@@ -88,9 +90,7 @@ class MemoryCache {
 }
 
 // Export singleton instance
-export const cache = new MemoryCache(
-    parseInt(process.env.CACHE_TTL_SECONDS || '300', 10)
-);
+export const cache = new MemoryCache(CACHE_TTL_SECONDS);
 
 // Cache key generators
 export const cacheKeys = {

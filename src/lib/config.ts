@@ -1,0 +1,7 @@
+export const REFRESH_INTERVAL_MS = 60_000;
+export const MARKET_POLL_INTERVAL_MS = REFRESH_INTERVAL_MS;
+
+export const CACHE_TTL_SECONDS = parseInt(process.env.CACHE_TTL_SECONDS || '300', 10);
+export const CACHE_TTL_MS = CACHE_TTL_SECONDS * 1000;
+
+

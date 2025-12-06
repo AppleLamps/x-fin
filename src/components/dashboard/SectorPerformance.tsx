@@ -1,33 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectorData } from '@/types';
+import { REFRESH_INTERVAL_MS } from '@/lib/config';
+
+const fetchSectors = async (): Promise<SectorData[]> => {
+    const response = await fetch('/api/market');
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch sectors');
+    }
+
+    const result = await response.json();
+    return result.sectors ?? [];
+};
 
 export function SectorPerformance() {
-    const [data, setData] = useState<SectorData[] | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await fetch('/api/market');
-                if (response.ok) {
-                    const result = await response.json();
-                    setData(result.sectors);
-                }
-            } catch (error) {
-                console.error('Failed to fetch sectors:', error);
-            } finally {
-                setIsLoading(false);
-            }
+    const { data, error, isLoading } = useSWR<SectorData[]>(
+        'sector-performance',
+        fetchSectors,
+        {
+            refreshInterval: REFRESH_INTERVAL_MS,
         }
-
-        fetchData();
-        const interval = setInterval(fetchData, 60000);
-        return () => clearInterval(interval);
-    }, []);
+    );
 
     if (isLoading) {
         return (
@@ -42,7 +39,15 @@ export function SectorPerformance() {
         );
     }
 
-    if (!data) {
+    if (error) {
+        return (
+            <Card className="p-4 bg-zinc-900/50 border-zinc-800">
+                <p className="text-sm text-zinc-500">Unable to load sectors</p>
+            </Card>
+        );
+    }
+
+    if (!data || data.length === 0) {
         return (
             <Card className="p-4 bg-zinc-900/50 border-zinc-800">
                 <p className="text-sm text-zinc-500">Unable to load sectors</p>

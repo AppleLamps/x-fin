@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
-import { mockMarketData } from '@/lib/market-data';
+import { getMarketDataProvider } from '@/lib/market-data';
+
+const marketDataProvider = getMarketDataProvider();
 
 export async function GET() {
     try {
         const [futures, vix, sectors, movers] = await Promise.all([
-            mockMarketData.getFuturesSnapshot(),
-            mockMarketData.getVix(),
-            mockMarketData.getSectorPerformance(),
-            mockMarketData.getGainersLosers(),
+            marketDataProvider.getFuturesSnapshot(),
+            marketDataProvider.getVix(),
+            marketDataProvider.getSectorPerformance(),
+            marketDataProvider.getGainersLosers(),
         ]);
 
         return NextResponse.json({

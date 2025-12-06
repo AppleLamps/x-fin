@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,6 +8,7 @@ import { RefreshCw, ExternalLink, AlertCircle } from 'lucide-react';
 import { MarketSummaryResponse, MarketSummarySection } from '@/types';
 import { useAppStore } from '@/lib/store';
 import { CitationsModal } from '@/components/ui/CitationsModal';
+import { REFRESH_INTERVAL_MS } from '@/lib/config';
 
 function formatTimeAgo(dateString: string): string {
     const date = new Date(dateString);
@@ -24,37 +25,35 @@ function formatTimeAgo(dateString: string): string {
     return date.toLocaleDateString();
 }
 
+const fetchMarketSummary = async (): Promise<MarketSummaryResponse> => {
+    const response = await fetch('/api/ai/market-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ region: 'US' }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch market summary');
+    }
+
+    return response.json();
+};
+
 export function MarketSummary() {
-    const [data, setData] = useState<MarketSummaryResponse | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const { openCitationsModal, citationsModalOpen, citationsModalData, closeCitationsModal } = useAppStore();
 
-    const fetchSummary = async () => {
-        setIsLoading(true);
-        setError(null);
+    const {
+        data,
+        error,
+        isLoading,
+        isValidating,
+        mutate,
+    } = useSWR<MarketSummaryResponse>('market-summary', fetchMarketSummary, {
+        refreshInterval: REFRESH_INTERVAL_MS,
+    });
 
-        try {
-            const response = await fetch('/api/ai/market-summary', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ region: 'US' }),
-            });
-
-            if (!response.ok) throw new Error('Failed to fetch market summary');
-
-            const result: MarketSummaryResponse = await response.json();
-            setData(result);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchSummary();
-    }, []);
+    const errorMessage = error instanceof Error ? error.message : error ? 'An error occurred' : null;
+    const isRefreshing = isValidating && !!data;
 
     if (isLoading) {
         return (
@@ -76,7 +75,7 @@ export function MarketSummary() {
         );
     }
 
-    if (error) {
+    if (errorMessage) {
         return (
             <Card className="p-5 bg-zinc-900/50 border-zinc-800">
                 <div className="flex items-center gap-2 text-amber-500 mb-4">
@@ -86,7 +85,7 @@ export function MarketSummary() {
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={fetchSummary}
+                    onClick={() => mutate()}
                     className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
                 >
                     <RefreshCw className="w-3 h-3 mr-2" />
@@ -110,11 +109,11 @@ export function MarketSummary() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={fetchSummary}
-                            disabled={isLoading}
+                            onClick={() => mutate()}
+                            disabled={isRefreshing}
                             className="h-7 w-7 p-0 text-zinc-400 hover:text-white hover:bg-zinc-800"
                         >
-                            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
                         </Button>
                     </div>
                 </div>

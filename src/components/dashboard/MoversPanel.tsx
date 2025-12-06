@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { MoversData, MoverStock } from '@/types';
+import { MARKET_POLL_INTERVAL_MS } from '@/lib/config';
 
 function StockRow({ stock }: { stock: MoverStock }) {
     const isPositive = stock.change >= 0;
@@ -60,7 +61,7 @@ export function MoversPanel() {
         }
 
         fetchData();
-        const interval = setInterval(fetchData, 60000);
+        const interval = setInterval(fetchData, MARKET_POLL_INTERVAL_MS);
         return () => clearInterval(interval);
     }, []);
 

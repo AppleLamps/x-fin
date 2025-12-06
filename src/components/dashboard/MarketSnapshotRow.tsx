@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Sparkline } from '@/components/charts';
 import { FuturesData, VixData } from '@/types';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { MARKET_POLL_INTERVAL_MS } from '@/lib/config';
 
 interface MarketSnapshotData {
     futures: FuturesData[];
@@ -32,8 +33,8 @@ export function MarketSnapshotRow() {
         }
 
         fetchData();
-        // Refresh every 60 seconds
-        const interval = setInterval(fetchData, 60000);
+        // Refresh at shared interval
+        const interval = setInterval(fetchData, MARKET_POLL_INTERVAL_MS);
         return () => clearInterval(interval);
     }, []);
 

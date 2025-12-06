@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, X, TrendingUp, TrendingDown } from 'lucide-react';
 import { useWatchlist } from '@/hooks/useWatchlist';
 import { StockQuote } from '@/types';
+import { MARKET_POLL_INTERVAL_MS } from '@/lib/config';
 
 export function WatchlistPanel() {
     const { symbols, addSymbol, removeSymbol, isLoaded } = useWatchlist();
@@ -46,8 +47,8 @@ export function WatchlistPanel() {
         }
 
         fetchQuotes();
-        // Refresh every 60 seconds
-        const interval = setInterval(fetchQuotes, 60000);
+        // Refresh every interval from shared config
+        const interval = setInterval(fetchQuotes, MARKET_POLL_INTERVAL_MS);
         return () => clearInterval(interval);
     }, [symbols, isLoaded]);
 
