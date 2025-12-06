@@ -2,101 +2,118 @@
 
 A modern, AI-powered market intelligence dashboard inspired by Perplexity Finance. Built with Next.js 14, TypeScript, and powered by xAI's Grok model with web search capabilities.
 
-![X-Fin Dashboard](docs/screenshot.png)
+## ✨ Features
 
-## Features
-
-- 📊 **Real-time Market Overview** - Futures, VIX, sector performance, and market movers
-- 🤖 **AI-Powered Analysis** - Market summaries and stock briefs using xAI Grok
+- 📊 **Real-time Market Overview** - Futures (S&P, Nasdaq, Dow), VIX, sector performance, and market movers
+- 🤖 **AI-Powered Analysis** - Market summaries and stock briefs using xAI Grok with web search
 - 🔍 **Web Search Integration** - AI uses real-time web search for up-to-date information
 - 📚 **Source Citations** - Transparent sourcing for all AI-generated content
 - ⭐ **Watchlist** - Track your favorite stocks with localStorage persistence
-- 🎨 **Modern Dark UI** - Clean, professional design inspired by Perplexity Finance
+- 🎨 **Modern Dark UI** - Clean, professional design with responsive layout
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Charts**: Recharts
-- **State**: Zustand + localStorage
-- **AI**: xAI Grok (grok-4-1-fast)
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Components | shadcn/ui |
+| Charts | Recharts |
+| State | Zustand + localStorage |
+| AI | xAI Grok (grok-4-1-fast) |
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
 - npm or yarn
-- xAI API key (optional for mock mode)
+- xAI API key (optional - app works with mock data)
 
 ### Installation
 
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/yourusername/x-fin.git
 cd x-fin
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Set up environment variables:
-```bash
+# Set up environment variables
 cp .env.example .env.local
-```
 
-4. Edit `.env.local` and add your xAI API key:
-```env
-XAI_API_KEY=your-xai-api-key-here
-```
+# Edit .env.local and add your xAI API key (optional)
+# XAI_API_KEY=your-xai-api-key-here
 
-5. Start the development server:
-```bash
+# Start the development server
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API route handlers
-│   │   ├── ai/           # AI endpoints (market-summary, ticker-brief)
-│   │   └── market/       # Market data endpoints
-│   ├── ticker/[symbol]/  # Ticker detail page
-│   ├── watchlist/        # Watchlist page
-│   └── settings/         # Settings page
+├── app/                          # Next.js App Router
+│   ├── api/
+│   │   ├── ai/
+│   │   │   ├── market-summary/   # POST - AI market summary
+│   │   │   └── ticker-brief/     # POST - AI stock analysis
+│   │   └── market/
+│   │       ├── route.ts          # GET - All market data
+│   │       └── quote/[symbol]/   # GET - Individual quote
+│   ├── ticker/[symbol]/          # Stock detail page
+│   ├── watchlist/                # Watchlist management
+│   ├── settings/                 # App settings
+│   ├── markets/                  # Markets page (placeholder)
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Dashboard
 ├── components/
-│   ├── charts/           # Chart components (Sparkline)
-│   ├── dashboard/        # Dashboard-specific components
-│   ├── layout/           # Layout components (NavRail, Header)
-│   ├── ticker/           # Ticker page components
-│   └── ui/               # shadcn/ui components
-├── hooks/                # Custom React hooks
+│   ├── charts/
+│   │   └── Sparkline.tsx         # Mini line charts
+│   ├── dashboard/
+│   │   ├── MarketSnapshotRow.tsx # Futures & VIX cards
+│   │   ├── MarketSummary.tsx     # AI-generated summary
+│   │   ├── WatchlistPanel.tsx    # Watchlist widget
+│   │   ├── MoversPanel.tsx       # Gainers/Losers/Active
+│   │   ├── SectorPerformance.tsx # Sector bars
+│   │   └── LatestUpdates.tsx     # News cards
+│   ├── layout/
+│   │   ├── NavRail.tsx           # Left navigation
+│   │   └── Header.tsx            # Top header with search
+│   └── ui/                       # shadcn/ui components
+├── hooks/
+│   ├── useWatchlist.ts           # Watchlist persistence
+│   └── use-toast.ts              # Toast notifications
 ├── lib/
-│   ├── ai/              # xAI Grok client and prompts
-│   ├── market-data/     # Market data providers
-│   ├── cache.ts         # In-memory caching
-│   └── store.ts         # Zustand store
-└── types/               # TypeScript type definitions
+│   ├── ai/
+│   │   ├── config.ts             # Model configuration
+│   │   ├── grok-client.ts        # xAI API client
+│   │   └── prompts.ts            # System prompts
+│   ├── market-data/
+│   │   ├── MarketDataProvider.ts # Provider interface
+│   │   └── MockMarketDataProvider.ts
+│   ├── cache.ts                  # In-memory TTL cache
+│   ├── store.ts                  # Zustand store
+│   └── utils.ts                  # Utility functions
+└── types/
+    └── index.ts                  # TypeScript definitions
 ```
 
-## API Endpoints
+## 🔌 API Endpoints
 
-### `POST /api/ai/market-summary`
+### Market Summary
 
-Generate an AI-powered market summary.
+```http
+POST /api/ai/market-summary
+Content-Type: application/json
 
-**Request:**
-```json
 {
-  "region": "US",
-  "focus": "tech"
+  "region": "US",      // optional, default: "US"
+  "focus": "tech"      // optional, focus area
 }
 ```
 
@@ -108,16 +125,16 @@ Generate an AI-powered market summary.
     { "title": "Macro/Fed", "summary": "..." },
     { "title": "Equities Breadth", "summary": "..." }
   ],
-  "citations": ["https://source1.com", "https://source2.com"]
+  "citations": ["https://...", "https://..."]
 }
 ```
 
-### `POST /api/ai/ticker-brief`
+### Ticker Brief
 
-Generate an AI analysis brief for a specific stock.
+```http
+POST /api/ai/ticker-brief
+Content-Type: application/json
 
-**Request:**
-```json
 {
   "symbol": "AAPL"
 }
@@ -132,11 +149,25 @@ Generate an AI analysis brief for a specific stock.
   "bearCase": ["iPhone sales slowing", "..."],
   "keyRisks": ["Regulatory scrutiny", "..."],
   "watchItems": ["iPhone 16 sales", "..."],
-  "citations": ["https://source1.com"]
+  "citations": ["https://..."]
 }
 ```
 
-## Configuration
+### Market Data
+
+```http
+GET /api/market
+```
+
+Returns futures, VIX, sectors, and movers data.
+
+```http
+GET /api/market/quote/AAPL
+```
+
+Returns quote for a specific symbol.
+
+## ⚙️ Configuration
 
 ### Environment Variables
 
@@ -149,7 +180,7 @@ Generate an AI analysis brief for a specific stock.
 
 ### Model Configuration
 
-The AI client is configured in `src/lib/ai/config.ts`:
+Edit `src/lib/ai/config.ts`:
 
 ```typescript
 export const AI_CONFIG = {
@@ -157,75 +188,83 @@ export const AI_CONFIG = {
   fallbackModel: 'grok-4-fast',
   tools: {
     webSearch: { enabled: true },
-    xSearch: { enabled: false }, // Scaffolded
+    xSearch: { enabled: false }, // Coming soon
   },
 };
 ```
 
-## Adding Real Market Data
+## 📈 Adding Real Market Data
 
-The project uses a provider pattern for market data. To add a real data source:
+The app uses a provider pattern. To add a real data source:
 
-1. Create a new provider implementing `MarketDataProvider`:
+1. **Create a new provider:**
 
 ```typescript
 // src/lib/market-data/AlphaVantageProvider.ts
 import { MarketDataProvider } from './MarketDataProvider';
 
 export class AlphaVantageProvider implements MarketDataProvider {
-  async getFuturesSnapshot() {
-    // Implement API call to Alpha Vantage
-  }
-  
-  async getVix() {
-    // Implement
-  }
-  
-  // ... other methods
+  async getFuturesSnapshot() { /* ... */ }
+  async getVix() { /* ... */ }
+  async getSectorPerformance() { /* ... */ }
+  async getGainersLosers() { /* ... */ }
+  async getQuote(symbol: string) { /* ... */ }
+  async getQuotes(symbols: string[]) { /* ... */ }
 }
 ```
 
-2. Update the API routes to use your provider:
+2. **Update API routes:**
 
 ```typescript
 // src/app/api/market/route.ts
 import { AlphaVantageProvider } from '@/lib/market-data/AlphaVantageProvider';
 
-const provider = new AlphaVantageProvider();
+const provider = new AlphaVantageProvider(process.env.ALPHA_VANTAGE_KEY);
 ```
 
 ### Suggested Data Providers
 
-- **Alpha Vantage** - Free tier available, good for getting started
-- **Polygon.io** - Real-time data, WebSocket support
+- **Alpha Vantage** - Free tier, good for starting
+- **Polygon.io** - Real-time, WebSocket support
 - **IEX Cloud** - Comprehensive market data
-- **Yahoo Finance** - Free, unofficial API available
+- **Finnhub** - Real-time quotes and news
 
-## Testing
-
-Run the test suite:
+## 🧪 Testing
 
 ```bash
+# Run tests
 npm run test
+
+# Run tests in watch mode
+npm run test:watch
 ```
 
 Tests cover:
-- MockMarketDataProvider methods
-- GrokClient JSON parsing and sanitization
-- Response validation
+- `MockMarketDataProvider` - all interface methods
+- `GrokClient` - JSON parsing and text sanitization
 
-## Future Extensions
+## 📝 Scripts
 
-The following features are scaffolded for future implementation:
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run Jest tests |
 
-- [ ] **Earnings Calendar** - Upcoming earnings dates
-- [ ] **Stock Screener** - Filter stocks by criteria
-- [ ] **Price Alerts** - Notifications for price movements
-- [ ] **Portfolio View** - Track your holdings
-- [ ] **X Search** - Search X/Twitter for sentiment
-- [ ] **Domain Allowlist** - Trust specific sources
+## 🔮 Roadmap
 
-## Contributing
+- [ ] Earnings Calendar integration
+- [ ] Stock Screener with filters
+- [ ] Price Alerts system
+- [ ] Portfolio tracking
+- [ ] X/Twitter search integration
+- [ ] Domain allowlist for trusted sources
+- [ ] Real-time WebSocket updates
+- [ ] Mobile app version
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
@@ -233,11 +272,11 @@ The following features are scaffolded for future implementation:
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-## License
+## 📄 License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 This application is for educational and informational purposes only. The AI-generated content is not financial advice. Always conduct your own research before making investment decisions.
 
